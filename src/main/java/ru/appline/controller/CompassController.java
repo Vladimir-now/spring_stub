@@ -47,6 +47,11 @@ public class CompassController {
     public Map<String, String> getSide(@RequestBody Map<String, Integer> degree) {
         Map<String, String> response = new HashMap<>();
 
+        if (0 > degree.get("Degree") || 360 < degree.get("Degree")) {
+            response.put("Error", "Неверно указаны координаты, допустимое значение от 0 до 359");
+            return response;
+        }
+
         for (Side s : sides.getSides()) {
             if (s.getFrom() < s.getTo()) {
                 if (degree.get("Degree") >= s.getFrom() && degree.get("Degree") <= s.getTo()) {
