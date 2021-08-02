@@ -32,6 +32,9 @@ public class Controller {
 
     @DeleteMapping(value = "/deletePet", consumes = MediaType.APPLICATION_JSON_VALUE)
     public String deletePet(@RequestBody Map<String, Integer> id) {
+        if (0 >= id.get("id") || petModel.getAll().get(id.get("id")) == null) {
+            return "Такого питомца не существует!";
+        }
         petModel.getAll().remove(id.get("id"));
         return "Вы удалили питомца:( Как вы могли!!!";
     }
@@ -40,15 +43,7 @@ public class Controller {
     public String putPet(@RequestBody Map<String, Object> newPet) {
         String response = null;
         Integer id = (Integer) newPet.get("id");
-        if (petModel.getAll().size() == 0) {
-            response = "Поздравляем! Ваш первый домашний питомец создан!";
-        } else {
-            if (petModel.getAll().get(id) == null) {
-                response  = "Ваш питомец успешно создан!";
-            } else if (petModel.getAll().get(id) != null) {
-                response = "Питомец был обновлен!";
-            }
-        }
+        if (0 >= id) return "ID питомца не может быть меньше 0";
 
         String name = (String) newPet.get("name");
         String type = (String) newPet.get("type");
@@ -56,7 +51,28 @@ public class Controller {
 
         Pet pet = new Pet(name, type, age);
 
-        petModel.add(pet, id);
+        if (petModel.getAll().get(id) != null) {
+            petModel.add(pet, id);
+            response = "Питомец был обновлен!";
+        } else {
+            boolean isCreate = false;
+            Integer i = 1;
+            for (Map.Entry u: petModel.getAll().entrySet()) {
+                if (!i.equals(u.getKey())) {
+                    petModel.add(pet, i);
+                    isCreate = true;
+                    response = "Был создан новый питомец! ID питомца: " + i;
+                    break;
+                } else {
+                    i++;
+                }
+            }
+            if (!isCreate) {
+                petModel.add(pet, i);
+                response = "Был создан новый питомец! ID питомца: " + i;
+            }
+        }
+
         return response;
     }
 
