@@ -41,7 +41,7 @@ public class Controller {
 
     @PutMapping(value = "/putPet", consumes = MediaType.APPLICATION_JSON_VALUE)
     public String putPet(@RequestBody Map<String, Object> newPet) {
-        String response = null;
+        String response;
         Integer id = (Integer) newPet.get("id");
         if (0 >= id) return "ID питомца не может быть меньше 0";
 
@@ -55,25 +55,9 @@ public class Controller {
             petModel.add(pet, id);
             response = "Питомец был обновлен!";
         } else {
-            boolean isCreate = false;
-            Integer i = 1;
-            for (Map.Entry u: petModel.getAll().entrySet()) {
-                if (!i.equals(u.getKey())) {
-                    petModel.add(pet, i);
-                    isCreate = true;
-                    response = "Был создан новый питомец! ID питомца: " + i;
-                    break;
-                } else {
-                    i++;
-                }
-            }
-            if (!isCreate) {
-                petModel.add(pet, i);
-                response = "Был создан новый питомец! ID питомца: " + i;
-            }
+            response = "Такого питомца не существует!";
         }
 
         return response;
     }
-
 }
